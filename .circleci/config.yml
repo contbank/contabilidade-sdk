@@ -1,7 +1,7 @@
 version: 2.1
 
 defaults: &defaults
-  working_directory: /go/src/github.com/contbank/contabilidade-sdk
+  working_directory: ~/contabilidade-sdk
 commands:
   autotag:
     steps:
@@ -32,7 +32,7 @@ jobs:
       # cadastrada em Project Settings > SSH Keys no CircleCI.
       - add_ssh_keys:
           fingerprints:
-            - "REPLACE_WITH_DEPLOY_KEY_FINGERPRINT"
+            - "SHA256:cd5plvVG9o5JswL9iiub8z10d1mUqY4V+t4wDrDcevg"
       - checkout
       - autotag
       - run:

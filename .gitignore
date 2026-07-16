@@ -1,0 +1,29 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Vendor directory (gerado no CI pelo build-package)
+vendor/
+
+# Arquivo gerado pelo autotag no CI
+current_version
+
+# Go workspace file
+go.work
+go.work.sum
+
+# env / config local
+.env
+config.yaml
+
+.vscode
+.idea/

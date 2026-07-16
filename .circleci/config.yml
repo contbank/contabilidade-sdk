@@ -1,0 +1,55 @@
+version: 2.1
+
+defaults: &defaults
+  working_directory: /go/src/github.com/contbank/contabilidade-sdk
+commands:
+  autotag:
+    steps:
+      - run: |
+          make install-autotag
+jobs:
+  run-tests:
+    <<: *defaults
+    docker:
+    - image: cimg/go:1.19
+    steps:
+      - checkout
+      - run:
+          name: Run Rebase
+          command: make run-rebase
+      - run:
+          name: Build Package
+          command: make build-package
+      - run:
+          name: Run Tests
+          command: make run-tests
+  release-version:
+    <<: *defaults
+    docker:
+    - image: cimg/go:1.19
+    steps:
+      # Substitua o fingerprint abaixo pelo da deploy key (com write access)
+      # cadastrada em Project Settings > SSH Keys no CircleCI.
+      - add_ssh_keys:
+          fingerprints:
+            - "REPLACE_WITH_DEPLOY_KEY_FINGERPRINT"
+      - checkout
+      - autotag
+      - run:
+          name: Tag Git Version
+          command: make tag-version
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - run-tests:
+          context: SANDBOX
+
+      - release-version:
+          requires:
+            - run-tests
+          filters:
+            branches:
+              only:
+                - master

@@ -1,0 +1,20 @@
+# Exemplo de seção para colar no config.yaml do microserviço consumidor
+# (ex.: nfe, billings). Espelha o padrão celcoin/bankly do monorepo.
+#
+# No container (DI manual):
+#   cfg := contabilidade.Config{
+#       APIEndpoint: settings.Contabilidade.APIEndpoint,
+#       BearerToken: settings.Contabilidade.BearerToken,
+#   }
+#   session, err := contabilidade.NewSession(cfg)
+#   httpClient := contabilidade.CreateBearerHTTPClient(session)
+#   client := contabilidade.NewClient(httpClient, *session)
+
+contabilidade:
+  mock: false
+  api_endpoint: https://nfse.contabilidade.com
+  # Token Bearer do Swagger (securitySchemes.Bearer). Preferir Secrets Manager em produção.
+  # Alternativa: variável de ambiente CONTABILIDADE_API_TOKEN.
+  bearer_token: ""
+  credentials:
+    secrets_manager_key: contabilidade/nfse

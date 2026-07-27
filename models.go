@@ -7,6 +7,7 @@ const (
 	PathEmitirNfse           = "/api/nfse/emitir"
 	PathCancelarNfse         = "/api/nfse/cancelar"
 	PathBaixarXmlNfse        = "/api/nfse/xml/%s/%d/%s" // im, numero, codigo
+	PathBaixarDanfse         = "/api/nfse/danfse/%s"    // chave acesso (Portal Nacional)
 	PathConsultarServicoCnae = "/api/servico/consultar-por-cnae"
 	PathListarMunicipios     = "/api/servico/municipios"
 	PathStatus               = "/api/status"
@@ -75,7 +76,10 @@ type EmitirNfseResponse struct {
 	CodigoVerificacao *string  `json:"CodigoVerificacao,omitempty"`
 	Link              *string  `json:"Link,omitempty"`
 	PdfUrl            *string  `json:"PdfUrl,omitempty"`
-	Erros             []string `json:"Erros,omitempty"`
+	// ChaveAcesso chave de 44 dígitos retornada pelo Portal Nacional (fora de SP).
+	// Necessária para download do DANFSe e cancelamento nacional.
+	ChaveAcesso *string  `json:"ChaveAcesso,omitempty"`
+	Erros       []string `json:"Erros,omitempty"`
 }
 
 // NotaFiscalInput holds the full NFS-e payload.

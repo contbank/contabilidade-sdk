@@ -18,6 +18,10 @@ type ContabilidadeClient interface {
 	// (POST /api/nfse/xml/{im}/{numero}/{codigo}).
 	BaixarXmlNfse(ctx context.Context, inscricaoMunicipal string, numero int64, codigoVerificacao string, cert CertificadoDto) ([]byte, error)
 
+	// BaixarDanfse downloads the DANFSe PDF of an NFS-e issued via Portal Nacional
+	// (POST /api/nfse/danfse/{chave}). certificadoBytes is the raw PFX/P12 content.
+	BaixarDanfse(ctx context.Context, chaveAcesso string, certificadoBytes []byte, senha string) ([]byte, error)
+
 	// ConsultarServicoPorCnae returns ISS service codes for one or more CNAEs
 	// (POST /api/servico/consultar-por-cnae).
 	ConsultarServicoPorCnae(ctx context.Context, req ConsultarServicoPorCnaeRequest) (*ConsultarServicoPorCnaeResponse, error)

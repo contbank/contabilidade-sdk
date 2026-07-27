@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -31,7 +32,11 @@ func (s *ClientSuite) SetupTest() {
 				Numero:            230,
 				CodigoVerificacao: contabilidade.String("LRJGC6HA"),
 				Link:              contabilidade.String("https://nfe.prefeitura.sp.gov.br/contribuinte/notaprint.aspx?nf=230&c=LRJGC6HA"),
+				ChaveAcesso:       contabilidade.String("35260620000000000000065000000000100000000001"),
 			})
+		case r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/api/nfse/danfse/"):
+			w.Header().Set("Content-Type", "application/pdf")
+			_, _ = w.Write([]byte("%PDF-1.4 mock-danfse"))
 		case r.Method == http.MethodGet && r.URL.Path == "/api/status":
 			w.WriteHeader(http.StatusOK)
 		default:
@@ -100,7 +105,45 @@ func (s *ClientSuite) TestEmitirNfse() {
 	s.Require().NoError(err)
 	s.Equal(int64(230), resp.Numero)
 	s.Equal("LRJGC6HA", *resp.CodigoVerificacao)
+	s.Require().NotNil(resp.ChaveAcesso)
+	s.Equal("35260620000000000000065000000000100000000001", *resp.ChaveAcesso)
 	s.True(resp.Sucesso)
+}
+
+func (s *ClientSuite) TestBaixarDanfse() {
+	pdf, err := s.client.BaixarDanfse(
+		context.Background(),
+		"35260620000000000000065000000000100000000001",
+		[]byte("fake-pfx-bytes"),
+		"senha123",
+	)
+	s.Require().NoError(err)
+	s.True(strings.HasPrefix(string(pdf), "%PDF-1.4"))
+}
+
+func (s *ClientSuite) TestBaixarDanfse_errorBody() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(s.T(), "Bearer test-token", r.Header.Get("Authorization"))
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`E1235 - Falha no esquema XML do DF-e.`))
+	}))
+	defer server.Close()
+
+	cfg := contabilidade.Config{
+		APIEndpoint: contabilidade.String(server.URL),
+		BearerToken: contabilidade.String("test-token"),
+		Timeout:     func() *time.Duration { d := 5 * time.Second; return &d }(),
+	}
+	session, err := contabilidade.NewSession(cfg)
+	s.Require().NoError(err)
+	client := contabilidade.NewClient(contabilidade.CreateBearerHTTPClient(session), *session)
+
+	_, err = client.BaixarDanfse(context.Background(), "chave", []byte("pfx"), "senha")
+	s.Require().Error(err)
+	ce, ok := contabilidade.ParseErr(err)
+	s.True(ok)
+	s.Equal("BAIXAR_DANFSE_ERROR", ce.ErrorKey)
+	s.Contains(ce.Error(), "E1235")
 }
 
 func (s *ClientSuite) TestStatus() {

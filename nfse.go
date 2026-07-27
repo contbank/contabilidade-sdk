@@ -3,6 +3,7 @@ package contabilidade
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -133,6 +134,75 @@ func (c *Client) BaixarXmlNfse(
 		return nil, newAPIError(ErrNfseNotFound, "NFSE_NOT_FOUND", []string{string(body)})
 	default:
 		return nil, newAPIError(ErrDefaultBaixarXml, "BAIXAR_XML_NFSE_ERROR", []string{
+			fmt.Sprintf("status %d: %s", resp.StatusCode, string(body)),
+		})
+	}
+}
+
+// BaixarDanfse sends POST /api/nfse/danfse/{chave} and returns raw PDF bytes.
+// Used for NFS-e emitted via Portal Nacional (outside São Paulo).
+// certificadoBytes must be the raw PFX/P12 content (will be base64-encoded in the request).
+func (c *Client) BaixarDanfse(
+	ctx context.Context,
+	chaveAcesso string,
+	certificadoBytes []byte,
+	senha string,
+) ([]byte, error) {
+	chaveAcesso = strings.TrimSpace(chaveAcesso)
+	if chaveAcesso == "" {
+		return nil, newAPIError(ErrInvalidRequest, "INVALID_REQUEST", []string{"chave de acesso is required"})
+	}
+	if len(certificadoBytes) == 0 {
+		return nil, newAPIError(ErrInvalidRequest, "INVALID_REQUEST", []string{"certificado bytes are required"})
+	}
+
+	path := fmt.Sprintf(PathBaixarDanfse, chaveAcesso)
+	endpoint := strings.TrimRight(c.session.APIEndpoint, "/") + path
+
+	logrus.WithFields(logrus.Fields{
+		"endpoint":   endpoint,
+		"request_id": ctx.Value("Request-Id"),
+		"chave":      chaveAcesso,
+	}).Info("BaixarDanfse")
+
+	base64Cert := base64.StdEncoding.EncodeToString(certificadoBytes)
+	cert := CertificadoDto{
+		EmissorBase64: &base64Cert,
+		EmissorSenha:  &senha,
+	}
+
+	payload, err := json.Marshal(cert)
+	if err != nil {
+		return nil, fmt.Errorf("BaixarDanfse: marshal: %w", err)
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(payload))
+	if err != nil {
+		return nil, fmt.Errorf("BaixarDanfse: new request: %w", err)
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Accept", "application/pdf, application/json")
+
+	resp, err := c.httpClient.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("BaixarDanfse: read body: %w", err)
+	}
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+		return body, nil
+	case http.StatusUnauthorized:
+		return nil, newAPIError(ErrUnauthorized, "UNAUTHORIZED", nil)
+	case http.StatusNotFound:
+		return nil, newAPIError(ErrNfseNotFound, "NFSE_NOT_FOUND", []string{string(body)})
+	default:
+		return nil, newAPIError(ErrDefaultBaixarDanfse, "BAIXAR_DANFSE_ERROR", []string{
 			fmt.Sprintf("status %d: %s", resp.StatusCode, string(body)),
 		})
 	}

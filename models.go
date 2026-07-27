@@ -87,6 +87,9 @@ type NotaFiscalInput struct {
 	CodigoServico                  *string                       `json:"CodigoServico,omitempty"`
 	CodigoLC116                    *string                       `json:"CodigoLC116,omitempty"`
 	CodigoCNAEServico              *string                       `json:"CodigoCNAEServico,omitempty"`
+	// CodigoTributacaoNacional (cTribNac) — obrigatório no Portal Nacional NFS-e.
+	// Exemplos: "010104" (desenvolvimento de software), "010101" (análise/desenvolvimento de sistemas).
+	CodigoTributacaoNacional       *string                       `json:"CodigoTributacaoNacional,omitempty"`
 	DiscriminacaoServico           *string                       `json:"DiscriminacaoServico,omitempty"`
 	DataEmissao                    *time.Time                    `json:"DataEmissao,omitempty"`
 	DataFatoGerador                *time.Time                    `json:"DataFatoGerador,omitempty"`

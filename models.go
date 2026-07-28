@@ -260,12 +260,13 @@ type ResultadoCnae struct {
 
 // CodigoServicoDto ...
 type CodigoServicoDto struct {
-	Codigo    *string `json:"Codigo,omitempty"`
-	ItemLC116 *string `json:"ItemLC116,omitempty"`
-	Descricao *string `json:"Descricao,omitempty"`
-	Natureza  *string `json:"Natureza,omitempty"`
-	Aliquota  float64 `json:"Aliquota"`
-	EmiteNFSe bool    `json:"EmiteNFSe"`
+	Codigo                   *string `json:"Codigo,omitempty"`
+	ItemLC116                *string `json:"ItemLC116,omitempty"`
+	Descricao                *string `json:"Descricao,omitempty"`
+	Natureza                 *string `json:"Natureza,omitempty"`
+	CodigoTributacaoNacional *string `json:"CodigoTributacaoNacional,omitempty"`
+	Aliquota                 float64 `json:"Aliquota"`
+	EmiteNFSe                bool    `json:"EmiteNFSe"`
 }
 
 // ProblemDetails follows RFC 7807-style error payloads from the gateway.

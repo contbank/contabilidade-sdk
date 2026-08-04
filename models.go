@@ -37,8 +37,17 @@ const (
 	OpcaoSimplesNaoInformado            OpcaoSimplesNFSeEnum = 99
 )
 
-// RegimeEspecialTributacaoEnum ...
+// RegimeEspecialTributacaoEnum códigos ABRASF (tsRegimeEspecialTributacao).
 type RegimeEspecialTributacaoEnum int32
+
+const (
+	RegimeEspecialMicroempresaMunicipal RegimeEspecialTributacaoEnum = 1
+	RegimeEspecialEstimativa            RegimeEspecialTributacaoEnum = 2
+	RegimeEspecialSociedadeProfissionais RegimeEspecialTributacaoEnum = 3
+	RegimeEspecialCooperativa           RegimeEspecialTributacaoEnum = 4
+	RegimeEspecialMEI                   RegimeEspecialTributacaoEnum = 5
+	RegimeEspecialMEEPP                 RegimeEspecialTributacaoEnum = 6
+)
 
 // TipoTributacaoNFSeEnum ...
 type TipoTributacaoNFSeEnum int32

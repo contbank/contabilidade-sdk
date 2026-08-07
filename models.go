@@ -241,7 +241,10 @@ type CancelarNfseResponse struct {
 	Numero            int64      `json:"Numero"`
 	CodigoVerificacao *string    `json:"CodigoVerificacao,omitempty"`
 	DataCancelamento  *time.Time `json:"DataCancelamento,omitempty"`
-	Erros             []string   `json:"Erros,omitempty"`
+	// PdfUrl URL do PDF atualizado (ex.: tarja CANCELADA). Nem todas as prefeituras devolvem;
+	// SP costuma atualizar o conteúdo no mesmo OriginalPdfUrl já conhecido.
+	PdfUrl *string  `json:"PdfUrl,omitempty"`
+	Erros  []string `json:"Erros,omitempty"`
 }
 
 // --- Serviço / CNAE ---

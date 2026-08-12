@@ -100,8 +100,7 @@ type NotaFiscalInput struct {
 	CodigoServico                  *string                       `json:"CodigoServico,omitempty"`
 	CodigoLC116                    *string                       `json:"CodigoLC116,omitempty"`
 	CodigoCNAEServico              *string                       `json:"CodigoCNAEServico,omitempty"`
-	// CodigoTributacaoNacional (cTribNac) — obrigatório no Portal Nacional NFS-e.
-	// Exemplos: "010104" (desenvolvimento de software), "010101" (análise/desenvolvimento de sistemas).
+	// Exemplos Portal Nacional: "010401" (elaboração de programas / LC 1.04), "010101", "171901" (contabilidade / LC 17.19).
 	CodigoTributacaoNacional       *string                       `json:"CodigoTributacaoNacional,omitempty"`
 	DiscriminacaoServico           *string                       `json:"DiscriminacaoServico,omitempty"`
 	DataEmissao                    *time.Time                    `json:"DataEmissao,omitempty"`
@@ -273,6 +272,7 @@ type ResultadoCnae struct {
 // CodigoServicoDto ...
 type CodigoServicoDto struct {
 	Codigo                   *string    `json:"Codigo,omitempty"`
+	CodigoServicoMunicipal   *string    `json:"CodigoServicoMunicipal,omitempty"`
 	ItemLC116                *string    `json:"ItemLC116,omitempty"`
 	Descricao                *string    `json:"Descricao,omitempty"`
 	Natureza                 *string    `json:"Natureza,omitempty"`

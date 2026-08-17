@@ -100,8 +100,10 @@ type NotaFiscalInput struct {
 	CodigoServico                  *string                       `json:"CodigoServico,omitempty"`
 	CodigoLC116                    *string                       `json:"CodigoLC116,omitempty"`
 	CodigoCNAEServico              *string                       `json:"CodigoCNAEServico,omitempty"`
-	// Exemplos Portal Nacional: "010401" (elaboração de programas / LC 1.04), "010101", "171901" (contabilidade / LC 17.19).
+	// Exemplos Portal Nacional: "010401" (elaboração de programas / LC 1.04), "171901" (contabilidade / LC 17.19).
 	CodigoTributacaoNacional       *string                       `json:"CodigoTributacaoNacional,omitempty"`
+	// cTribMun (código municipal de tributação). Ex.: "001". Não confundir com cTribNac (6 dígitos).
+	CodigoTributacaoMunicipal      *string                       `json:"CodigoTributacaoMunicipal,omitempty"`
 	DiscriminacaoServico           *string                       `json:"DiscriminacaoServico,omitempty"`
 	DataEmissao                    *time.Time                    `json:"DataEmissao,omitempty"`
 	DataFatoGerador                *time.Time                    `json:"DataFatoGerador,omitempty"`
@@ -276,7 +278,8 @@ type CodigoServicoDto struct {
 	ItemLC116                *string    `json:"ItemLC116,omitempty"`
 	Descricao                *string    `json:"Descricao,omitempty"`
 	Natureza                 *string    `json:"Natureza,omitempty"`
-	CodigoTributacaoNacional *string    `json:"CodigoTributacaoNacional,omitempty"`
+	CodigoTributacaoNacional  *string    `json:"CodigoTributacaoNacional,omitempty"`
+	CodigoTributacaoMunicipal *string    `json:"CodigoTributacaoMunicipal,omitempty"`
 	Aliquota                 float64    `json:"Aliquota"`
 	EmiteNFSe                bool       `json:"EmiteNFSe"`
 	EncerradoEm              *time.Time `json:"EncerradoEm,omitempty"`

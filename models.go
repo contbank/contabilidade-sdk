@@ -271,20 +271,24 @@ type ResultadoCnae struct {
 	CodigosServico []CodigoServicoDto `json:"CodigosServico,omitempty"`
 }
 
-// CodigoServicoDto ...
+// CodigoServicoDto (ServiceSuggestion) código municipal sugerido por CNAE.
 type CodigoServicoDto struct {
-	Codigo                   *string    `json:"Codigo,omitempty"`
-	CodigoServicoMunicipal   *string    `json:"CodigoServicoMunicipal,omitempty"`
-	ItemLC116                *string    `json:"ItemLC116,omitempty"`
-	Descricao                *string    `json:"Descricao,omitempty"`
-	Natureza                 *string    `json:"Natureza,omitempty"`
+	Codigo                    *string    `json:"Codigo,omitempty"`
+	CodigoServicoMunicipal    *string    `json:"CodigoServicoMunicipal,omitempty"`
+	ItemLC116                 *string    `json:"ItemLC116,omitempty"`
+	Descricao                 *string    `json:"Descricao,omitempty"`
+	Natureza                  *string    `json:"Natureza,omitempty"`
 	CodigoTributacaoNacional  *string    `json:"CodigoTributacaoNacional,omitempty"`
 	CodigoTributacaoMunicipal *string    `json:"CodigoTributacaoMunicipal,omitempty"`
-	Aliquota                 float64    `json:"Aliquota"`
-	EmiteNFSe                bool       `json:"EmiteNFSe"`
-	EncerradoEm              *time.Time `json:"EncerradoEm,omitempty"`
-	Observacao               *string    `json:"Observacao,omitempty"`
+	Anexo                     int        `json:"Anexo,omitempty"` // anexo do Simples Nacional sugerido para o CNAE (3, 4 ou 5)
+	Aliquota                  float64    `json:"Aliquota"`
+	EmiteNFSe                 bool       `json:"EmiteNFSe"`
+	EncerradoEm               *time.Time `json:"EncerradoEm,omitempty"`
+	Observacao                *string    `json:"Observacao,omitempty"`
 }
+
+// ServiceSuggestion alias de CodigoServicoDto — sugestão de serviço por CNAE (Anexo).
+type ServiceSuggestion = CodigoServicoDto
 
 // ProblemDetails follows RFC 7807-style error payloads from the gateway.
 type ProblemDetails struct {

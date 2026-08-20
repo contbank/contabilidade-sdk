@@ -280,7 +280,8 @@ type CodigoServicoDto struct {
 	Natureza                  *string    `json:"Natureza,omitempty"`
 	CodigoTributacaoNacional  *string    `json:"CodigoTributacaoNacional,omitempty"`
 	CodigoTributacaoMunicipal *string    `json:"CodigoTributacaoMunicipal,omitempty"`
-	Anexo                     int        `json:"Anexo,omitempty"` // anexo do Simples Nacional sugerido para o CNAE (3, 4 ou 5)
+	// Anexo do Simples Nacional (ex.: "3", "4", "5"). String porque a API pode enviar "".
+	Anexo                     string     `json:"Anexo,omitempty"`
 	Aliquota                  float64    `json:"Aliquota"`
 	EmiteNFSe                 bool       `json:"EmiteNFSe"`
 	EncerradoEm               *time.Time `json:"EncerradoEm,omitempty"`

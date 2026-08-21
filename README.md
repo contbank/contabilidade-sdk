@@ -22,6 +22,14 @@ httpClient := contabilidade.CreateBearerHTTPClient(session)
 client := contabilidade.NewClient(httpClient, *session)
 
 resp, err := client.EmitirNfse(ctx, contabilidade.EmitirNfseRequest{ /* ... */ })
+
+// Consulta assíncrona de notas (período):
+// 1) token, err := client.SolicitarConsulta(ctx, req)
+// 2) status, err := client.ConsultarStatus(ctx, *token.Token)
+// 3) notas, err := client.BaixarNotas(ctx, *token.Token)  // XmlBase64 por nota
 ```
 
 Ver `config.example.yaml` para a seção YAML.
+
+Swagger: https://nfse.contabilidade.com/swagger/index.html
+

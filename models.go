@@ -4,13 +4,32 @@ import "time"
 
 // API path constants (Contabilidade.com NFS-e gateway).
 const (
-	PathEmitirNfse           = "/api/nfse/emitir"
-	PathCancelarNfse         = "/api/nfse/cancelar"
-	PathBaixarXmlNfse        = "/api/nfse/xml/%s/%d/%s" // im, numero, codigo
-	PathBaixarDanfse         = "/api/nfse/danfse/%s"    // chave acesso (Portal Nacional)
-	PathConsultarServicoCnae = "/api/servico/consultar-por-cnae"
-	PathListarMunicipios     = "/api/servico/municipios"
-	PathStatus               = "/api/status"
+	PathEmitirNfse             = "/api/nfse/emitir"
+	PathCancelarNfse           = "/api/nfse/cancelar"
+	PathBaixarXmlNfse          = "/api/nfse/xml/%s/%d/%s" // im, numero, codigo
+	PathBaixarDanfse           = "/api/nfse/danfse/%s"    // chave acesso (Portal Nacional)
+	PathSolicitarConsultaNotas = "/api/consulta-notas/solicitar"
+	PathConsultaNotasStatus    = "/api/consulta-notas/%s/status" // token
+	PathConsultaNotasListar    = "/api/consulta-notas/%s/notas"  // token
+	PathConsultarServicoCnae   = "/api/servico/consultar-por-cnae"
+	PathListarMunicipios       = "/api/servico/municipios"
+	PathStatus                 = "/api/status"
+)
+
+// Consulta de notas — status da solicitação assíncrona.
+const (
+	ConsultaNotasStatusPendente    = "Pendente"
+	ConsultaNotasStatusProcessando = "Processando"
+	ConsultaNotasStatusFinalizado  = "Finalizado"
+	ConsultaNotasStatusErro        = "Erro"
+)
+
+// Nota consultada — Status / Direcao.
+const (
+	NotaConsultadaStatusEmitida   = "Emitida"
+	NotaConsultadaStatusCancelada = "Cancelada"
+	NotaConsultadaDirecaoEmitida  = "Emitida"
+	NotaConsultadaDirecaoRecebida = "Recebida"
 )
 
 // --- Enums (Swagger) ---
@@ -246,6 +265,56 @@ type CancelarNfseResponse struct {
 	// SP costuma atualizar o conteúdo no mesmo OriginalPdfUrl já conhecido.
 	PdfUrl *string  `json:"PdfUrl,omitempty"`
 	Erros  []string `json:"Erros,omitempty"`
+}
+
+// --- Consulta de notas (assíncrona) ---
+
+// SolicitarConsultaNotasRequest is the body for POST /api/consulta-notas/solicitar.
+// MunicipioCodigoIBGE "3550308" (SP) usa PMSP e exige InscricaoMunicipal; demais usam Portal Nacional.
+type SolicitarConsultaNotasRequest struct {
+	Certificado          *CertificadoDto `json:"Certificado,omitempty"`
+	MunicipioCodigoIBGE  *string         `json:"MunicipioCodigoIBGE,omitempty"`
+	InscricaoMunicipal   *string         `json:"InscricaoMunicipal,omitempty"`
+	DataInicio           *time.Time      `json:"DataInicio,omitempty"`
+	DataFim              *time.Time      `json:"DataFim,omitempty"`
+}
+
+// SolicitarConsultaNotasResponse returns the tracking token for the async job.
+type SolicitarConsultaNotasResponse struct {
+	Sucesso bool     `json:"Sucesso"`
+	Token   *string  `json:"Token,omitempty"`
+	Erros   []string `json:"Erros,omitempty"`
+}
+
+// ConsultaNotasStatusResponse is the body for GET /api/consulta-notas/{token}/status.
+type ConsultaNotasStatusResponse struct {
+	Sucesso         bool       `json:"Sucesso"`
+	Token           *string    `json:"Token,omitempty"`
+	Finalizado      bool       `json:"Finalizado"`
+	Status          *string    `json:"Status,omitempty"` // Pendente | Processando | Finalizado | Erro
+	DataCriacao     *time.Time `json:"DataCriacao,omitempty"`
+	DataFinalizacao *time.Time `json:"DataFinalizacao,omitempty"`
+	Erros           []string   `json:"Erros,omitempty"`
+}
+
+// ListarNotasConsultadasResponse is the body for GET /api/consulta-notas/{token}/notas.
+type ListarNotasConsultadasResponse struct {
+	Sucesso        bool                `json:"Sucesso"`
+	Token          *string             `json:"Token,omitempty"`
+	StatusConsulta *string             `json:"StatusConsulta,omitempty"`
+	Notas          []NotaConsultadaDto `json:"Notas,omitempty"`
+	Erros          []string            `json:"Erros,omitempty"`
+}
+
+// NotaConsultadaDto is one invoice found by a consulta-notas job (XML in base64).
+type NotaConsultadaDto struct {
+	Nro         *string    `json:"Nro,omitempty"`
+	Chave       *string    `json:"Chave,omitempty"`
+	DataEmissao *time.Time `json:"DataEmissao,omitempty"`
+	Status      *string    `json:"Status,omitempty"`   // Emitida | Cancelada
+	Direcao     *string    `json:"Direcao,omitempty"` // Emitida | Recebida
+	// XmlBase64 is UTF-8 XML encoded as base64 (not raw XML text).
+	XmlBase64 *string `json:"XmlBase64,omitempty"`
 }
 
 // --- Serviço / CNAE ---

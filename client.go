@@ -22,6 +22,18 @@ type ContabilidadeClient interface {
 	// (POST /api/nfse/danfse/{chave}). certificadoBytes is the raw PFX/P12 content.
 	BaixarDanfse(ctx context.Context, chaveAcesso string, certificadoBytes []byte, senha string) ([]byte, error)
 
+	// SolicitarConsulta starts an async notes consultation for a period
+	// (POST /api/consulta-notas/solicitar) and returns a tracking token.
+	SolicitarConsulta(ctx context.Context, req SolicitarConsultaNotasRequest) (*SolicitarConsultaNotasResponse, error)
+
+	// ConsultarStatus polls whether a notes consultation finished
+	// (GET /api/consulta-notas/{token}/status).
+	ConsultarStatus(ctx context.Context, token string) (*ConsultaNotasStatusResponse, error)
+
+	// BaixarNotas lists notes found by a consultation (with XmlBase64)
+	// (GET /api/consulta-notas/{token}/notas).
+	BaixarNotas(ctx context.Context, token string) (*ListarNotasConsultadasResponse, error)
+
 	// ConsultarServicoPorCnae returns ISS service codes for one or more CNAEs
 	// (POST /api/servico/consultar-por-cnae).
 	ConsultarServicoPorCnae(ctx context.Context, req ConsultarServicoPorCnaeRequest) (*ConsultarServicoPorCnaeResponse, error)

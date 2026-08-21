@@ -37,6 +37,33 @@ func (s *ClientSuite) SetupTest() {
 		case r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/api/nfse/danfse/"):
 			w.Header().Set("Content-Type", "application/pdf")
 			_, _ = w.Write([]byte("%PDF-1.4 mock-danfse"))
+		case r.Method == http.MethodPost && r.URL.Path == "/api/consulta-notas/solicitar":
+			_ = json.NewEncoder(w).Encode(contabilidade.SolicitarConsultaNotasResponse{
+				Sucesso: true,
+				Token:   contabilidade.String("11111111-2222-3333-4444-555555555555"),
+			})
+		case r.Method == http.MethodGet && r.URL.Path == "/api/consulta-notas/11111111-2222-3333-4444-555555555555/status":
+			_ = json.NewEncoder(w).Encode(contabilidade.ConsultaNotasStatusResponse{
+				Sucesso:    true,
+				Token:      contabilidade.String("11111111-2222-3333-4444-555555555555"),
+				Finalizado: true,
+				Status:     contabilidade.String(contabilidade.ConsultaNotasStatusFinalizado),
+			})
+		case r.Method == http.MethodGet && r.URL.Path == "/api/consulta-notas/11111111-2222-3333-4444-555555555555/notas":
+			_ = json.NewEncoder(w).Encode(contabilidade.ListarNotasConsultadasResponse{
+				Sucesso:        true,
+				Token:          contabilidade.String("11111111-2222-3333-4444-555555555555"),
+				StatusConsulta: contabilidade.String(contabilidade.ConsultaNotasStatusFinalizado),
+				Notas: []contabilidade.NotaConsultadaDto{
+					{
+						Nro:       contabilidade.String("230"),
+						Chave:     contabilidade.String("35260620000000000000065000000000100000000001"),
+						Status:    contabilidade.String(contabilidade.NotaConsultadaStatusEmitida),
+						Direcao:   contabilidade.String(contabilidade.NotaConsultadaDirecaoEmitida),
+						XmlBase64: contabilidade.String("PGttbD5tb2NrPC9rbWw+"),
+					},
+				},
+			})
 		case r.Method == http.MethodGet && r.URL.Path == "/api/status":
 			w.WriteHeader(http.StatusOK)
 		default:
@@ -151,6 +178,54 @@ func (s *ClientSuite) TestBaixarDanfse_errorBody() {
 func (s *ClientSuite) TestStatus() {
 	err := s.client.Status(context.Background())
 	s.NoError(err)
+}
+
+func (s *ClientSuite) TestSolicitarConsulta() {
+	inicio := time.Date(2026, 8, 1, 0, 0, 0, 0, time.UTC)
+	fim := time.Date(2026, 8, 31, 0, 0, 0, 0, time.UTC)
+
+	resp, err := s.client.SolicitarConsulta(context.Background(), contabilidade.SolicitarConsultaNotasRequest{
+		Certificado: &contabilidade.CertificadoDto{
+			EmissorDocumento: contabilidade.String("56929454000104"),
+			EmissorBase64:    contabilidade.String("MIIKJAIBAzCCCeA..."),
+			EmissorSenha:     contabilidade.String("senha123"),
+		},
+		MunicipioCodigoIBGE: contabilidade.String("3550308"),
+		InscricaoMunicipal:  contabilidade.String("14708477"),
+		DataInicio:          &inicio,
+		DataFim:             &fim,
+	})
+
+	s.Require().NoError(err)
+	s.True(resp.Sucesso)
+	s.Require().NotNil(resp.Token)
+	s.Equal("11111111-2222-3333-4444-555555555555", *resp.Token)
+}
+
+func (s *ClientSuite) TestConsultarStatus() {
+	resp, err := s.client.ConsultarStatus(context.Background(), "11111111-2222-3333-4444-555555555555")
+	s.Require().NoError(err)
+	s.True(resp.Sucesso)
+	s.True(resp.Finalizado)
+	s.Require().NotNil(resp.Status)
+	s.Equal(contabilidade.ConsultaNotasStatusFinalizado, *resp.Status)
+}
+
+func (s *ClientSuite) TestBaixarNotas() {
+	resp, err := s.client.BaixarNotas(context.Background(), "11111111-2222-3333-4444-555555555555")
+	s.Require().NoError(err)
+	s.True(resp.Sucesso)
+	s.Require().Len(resp.Notas, 1)
+	s.Equal("230", *resp.Notas[0].Nro)
+	s.Equal("PGttbD5tb2NrPC9rbWw+", *resp.Notas[0].XmlBase64)
+}
+
+func (s *ClientSuite) TestConsultarStatus_emptyToken() {
+	_, err := s.client.ConsultarStatus(context.Background(), "  ")
+	s.Require().Error(err)
+	ce, ok := contabilidade.ParseErr(err)
+	s.True(ok)
+	s.Equal("INVALID_REQUEST", ce.ErrorKey)
 }
 
 func TestClientSuite(t *testing.T) {

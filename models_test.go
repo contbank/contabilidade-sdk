@@ -3,6 +3,7 @@ package contabilidade_test
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	contabilidade "github.com/contbank/contabilidade-sdk"
 )
@@ -40,5 +41,56 @@ func TestServiceSuggestion_unmarshalsEmptyAnexo(t *testing.T) {
 	}
 	if got.Anexo != "" {
 		t.Fatalf("Anexo = %q, want empty", got.Anexo)
+	}
+}
+
+func TestConsultaNotasStatusResponse_unmarshalsDotNetTimestamps(t *testing.T) {
+	raw := []byte(`{
+		"Sucesso":true,
+		"Token":"2e9dd291-e10f-47d9-ab12-11a17db2acf9",
+		"Finalizado":false,
+		"Status":"Erro",
+		"DataCriacao":"2026-08-25T14:34:39.6866667",
+		"DataFinalizacao":"2026-08-25T14:34:41.1866667",
+		"Erros":[]
+	}`)
+
+	var got contabilidade.ConsultaNotasStatusResponse
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if got.Status == nil || *got.Status != contabilidade.ConsultaNotasStatusErro {
+		t.Fatalf("Status = %#v", got.Status)
+	}
+	if got.DataCriacao == nil {
+		t.Fatal("DataCriacao nil")
+	}
+	wantCriacao := time.Date(2026, 8, 25, 14, 34, 39, 686666700, time.UTC)
+	if !got.DataCriacao.Equal(wantCriacao) {
+		t.Fatalf("DataCriacao = %v, want %v", got.DataCriacao.Time, wantCriacao)
+	}
+	if got.DataFinalizacao == nil {
+		t.Fatal("DataFinalizacao nil")
+	}
+}
+
+func TestAPITime_unmarshalsRFC3339(t *testing.T) {
+	raw := []byte(`"2026-08-25T14:34:39.6866667Z"`)
+	var got contabilidade.APITime
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if got.Location() != time.UTC {
+		t.Fatalf("location = %v", got.Location())
+	}
+}
+
+func TestParseFlexibleDateTime_normalizesSpacedOffset(t *testing.T) {
+	got, err := contabilidade.ParseFlexibleDateTime("2026-07-01T05:00:00.000 02:00")
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	if _, offset := got.Zone(); offset != 2*3600 {
+		t.Fatalf("offset = %d, want +02:00", offset)
 	}
 }

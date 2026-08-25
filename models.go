@@ -288,13 +288,13 @@ type SolicitarConsultaNotasResponse struct {
 
 // ConsultaNotasStatusResponse is the body for GET /api/consulta-notas/{token}/status.
 type ConsultaNotasStatusResponse struct {
-	Sucesso         bool       `json:"Sucesso"`
-	Token           *string    `json:"Token,omitempty"`
-	Finalizado      bool       `json:"Finalizado"`
-	Status          *string    `json:"Status,omitempty"` // Pendente | Processando | Finalizado | Erro
-	DataCriacao     *time.Time `json:"DataCriacao,omitempty"`
-	DataFinalizacao *time.Time `json:"DataFinalizacao,omitempty"`
-	Erros           []string   `json:"Erros,omitempty"`
+	Sucesso         bool     `json:"Sucesso"`
+	Token           *string  `json:"Token,omitempty"`
+	Finalizado      bool     `json:"Finalizado"`
+	Status          *string  `json:"Status,omitempty"` // Pendente | Processando | Finalizado | Erro
+	DataCriacao     *APITime `json:"DataCriacao,omitempty"`
+	DataFinalizacao *APITime `json:"DataFinalizacao,omitempty"`
+	Erros           []string `json:"Erros,omitempty"`
 }
 
 // ListarNotasConsultadasResponse is the body for GET /api/consulta-notas/{token}/notas.
@@ -308,11 +308,11 @@ type ListarNotasConsultadasResponse struct {
 
 // NotaConsultadaDto is one invoice found by a consulta-notas job (XML in base64).
 type NotaConsultadaDto struct {
-	Nro         *string    `json:"Nro,omitempty"`
-	Chave       *string    `json:"Chave,omitempty"`
-	DataEmissao *time.Time `json:"DataEmissao,omitempty"`
-	Status      *string    `json:"Status,omitempty"`   // Emitida | Cancelada
-	Direcao     *string    `json:"Direcao,omitempty"` // Emitida | Recebida
+	Nro         *string  `json:"Nro,omitempty"`
+	Chave       *string  `json:"Chave,omitempty"`
+	DataEmissao *APITime `json:"DataEmissao,omitempty"`
+	Status      *string  `json:"Status,omitempty"`   // Emitida | Cancelada
+	Direcao     *string  `json:"Direcao,omitempty"` // Emitida | Recebida
 	// XmlBase64 is UTF-8 XML encoded as base64 (not raw XML text).
 	XmlBase64 *string `json:"XmlBase64,omitempty"`
 }

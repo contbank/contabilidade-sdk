@@ -1,6 +1,10 @@
 package contabilidade
 
-import "time"
+import (
+	"time"
+
+	"github.com/contbank/contabilidade-sdk/pkg/models"
+)
 
 // API path constants (Contabilidade.com NFS-e gateway).
 const (
@@ -348,10 +352,10 @@ type CodigoServicoDto struct {
 	Descricao                 *string    `json:"Descricao,omitempty"`
 	Natureza                  *string    `json:"Natureza,omitempty"`
 	CodigoTributacaoNacional  *string    `json:"CodigoTributacaoNacional,omitempty"`
-	CodigoTributacaoMunicipal *string    `json:"CodigoTributacaoMunicipal,omitempty"`
-	// Anexo do Simples Nacional (ex.: "3", "4", "5"). String porque a API pode enviar "".
-	Anexo                     string     `json:"Anexo,omitempty"`
-	Aliquota                  float64    `json:"Aliquota"`
+	CodigoTributacaoMunicipal *string          `json:"CodigoTributacaoMunicipal,omitempty"`
+	// Anexo do Simples Nacional (3, 4 ou 5). Aceita int, string, romano ou array via FlexAnnex.
+	Anexo                     models.FlexAnnex `json:"Anexo,omitempty"`
+	Aliquota                  float64          `json:"Aliquota"`
 	EmiteNFSe                 bool       `json:"EmiteNFSe"`
 	EncerradoEm               *time.Time `json:"EncerradoEm,omitempty"`
 	Observacao                *string    `json:"Observacao,omitempty"`

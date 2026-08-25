@@ -84,3 +84,13 @@ func TestAPITime_unmarshalsRFC3339(t *testing.T) {
 		t.Fatalf("location = %v", got.Location())
 	}
 }
+
+func TestParseFlexibleDateTime_normalizesSpacedOffset(t *testing.T) {
+	got, err := contabilidade.ParseFlexibleDateTime("2026-07-01T05:00:00.000 02:00")
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	if _, offset := got.Zone(); offset != 2*3600 {
+		t.Fatalf("offset = %d, want +02:00", offset)
+	}
+}

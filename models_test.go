@@ -6,6 +6,7 @@ import (
 	"time"
 
 	contabilidade "github.com/contbank/contabilidade-sdk"
+	"github.com/contbank/contabilidade-sdk/pkg/models"
 )
 
 func TestServiceSuggestion_unmarshalsAnexoAsString(t *testing.T) {
@@ -21,8 +22,8 @@ func TestServiceSuggestion_unmarshalsAnexoAsString(t *testing.T) {
 	if err := json.Unmarshal(raw, &got); err != nil {
 		t.Fatalf("unmarshal: %v", err)
 	}
-	if got.Anexo != "5" {
-		t.Fatalf("Anexo = %q, want %q", got.Anexo, "5")
+	if got.Anexo != 5 {
+		t.Fatalf("Anexo = %d, want 5", got.Anexo)
 	}
 	if got.Codigo == nil || *got.Codigo != "02666" {
 		t.Fatalf("Codigo = %#v", got.Codigo)
@@ -39,8 +40,31 @@ func TestServiceSuggestion_unmarshalsEmptyAnexo(t *testing.T) {
 	if err := json.Unmarshal(raw, &got); err != nil {
 		t.Fatalf("unmarshal empty Anexo: %v", err)
 	}
-	if got.Anexo != "" {
-		t.Fatalf("Anexo = %q, want empty", got.Anexo)
+	if got.Anexo != 0 {
+		t.Fatalf("Anexo = %d, want 0", got.Anexo)
+	}
+}
+
+func TestServiceSuggestion_unmarshalsAnexoRomanArrayAndNumber(t *testing.T) {
+	cases := []struct {
+		name string
+		raw  string
+		want models.FlexAnnex
+	}{
+		{name: "roman", raw: `{"Anexo":"III"}`, want: 3},
+		{name: "array", raw: `{"Anexo":["IV"]}`, want: 4},
+		{name: "number", raw: `{"Anexo":5}`, want: 5},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			var got contabilidade.CodigoServicoDto
+			if err := json.Unmarshal([]byte(tc.raw), &got); err != nil {
+				t.Fatalf("unmarshal: %v", err)
+			}
+			if got.Anexo != tc.want {
+				t.Fatalf("Anexo = %d, want %d", got.Anexo, tc.want)
+			}
+		})
 	}
 }
 

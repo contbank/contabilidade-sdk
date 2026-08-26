@@ -110,6 +110,25 @@ func TestAPITime_unmarshalsRFC3339(t *testing.T) {
 	}
 }
 
+func TestEmitirNfseResponse_unmarshalsXmlBase64AndChaveAcesso(t *testing.T) {
+	raw := []byte(`{
+		"Sucesso": true,
+		"Numero": 230,
+		"XmlBase64": "PGttbD5tb2NrPC9rbWw+",
+		"ChaveAcesso": "35260620000000000000065000000000100000000001"
+	}`)
+	var got contabilidade.EmitirNfseResponse
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if got.XmlBase64 == nil || *got.XmlBase64 != "PGttbD5tb2NrPC9rbWw+" {
+		t.Fatalf("XmlBase64 = %#v", got.XmlBase64)
+	}
+	if got.ChaveAcesso == nil || *got.ChaveAcesso != "35260620000000000000065000000000100000000001" {
+		t.Fatalf("ChaveAcesso = %#v", got.ChaveAcesso)
+	}
+}
+
 func TestCancelarNfseRequest_marshalsNacionalFields(t *testing.T) {
 	codigo := int32(contabilidade.MotivoCancelamentoErroEmissao)
 	req := contabilidade.CancelarNfseRequest{

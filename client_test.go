@@ -32,6 +32,7 @@ func (s *ClientSuite) SetupTest() {
 				Numero:            230,
 				CodigoVerificacao: contabilidade.String("LRJGC6HA"),
 				Link:              contabilidade.String("https://nfe.prefeitura.sp.gov.br/contribuinte/notaprint.aspx?nf=230&c=LRJGC6HA"),
+				XmlBase64:         contabilidade.String("PGttbD5tb2NrPC9rbWw+"),
 				ChaveAcesso:       contabilidade.String("35260620000000000000065000000000100000000001"),
 			})
 		case r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/api/nfse/danfse/"):
@@ -134,6 +135,8 @@ func (s *ClientSuite) TestEmitirNfse() {
 	s.Require().NoError(err)
 	s.Equal(int64(230), resp.Numero)
 	s.Equal("LRJGC6HA", *resp.CodigoVerificacao)
+	s.Require().NotNil(resp.XmlBase64)
+	s.Equal("PGttbD5tb2NrPC9rbWw+", *resp.XmlBase64)
 	s.Require().NotNil(resp.ChaveAcesso)
 	s.Equal("35260620000000000000065000000000100000000001", *resp.ChaveAcesso)
 	s.True(resp.Sucesso)

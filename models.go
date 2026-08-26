@@ -108,8 +108,10 @@ type EmitirNfseResponse struct {
 	CodigoVerificacao *string  `json:"CodigoVerificacao,omitempty"`
 	Link              *string  `json:"Link,omitempty"`
 	PdfUrl            *string  `json:"PdfUrl,omitempty"`
+	// XmlBase64 XML da NFS-e emitida, UTF-8 em Base64 (quando a API devolve o artefato).
+	XmlBase64 *string `json:"XmlBase64,omitempty"`
 	// ChaveAcesso chave de 44 dígitos retornada pelo Portal Nacional (fora de SP).
-	// Necessária para download do DANFSe e cancelamento nacional.
+	// Necessária para download do DANFSe, cancelamento nacional e busca de notas nacionais.
 	ChaveAcesso *string  `json:"ChaveAcesso,omitempty"`
 	Erros       []string `json:"Erros,omitempty"`
 }

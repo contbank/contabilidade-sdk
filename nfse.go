@@ -56,6 +56,8 @@ func (c *Client) CancelarNfse(ctx context.Context, req CancelarNfseRequest) (*Ca
 		"endpoint":   endpoint,
 		"request_id": ctx.Value("Request-Id"),
 		"numero":     req.Numero,
+		"ibge":       stringPtrValue(req.MunicipioCodigoIBGE),
+		"has_chave":  req.ChaveAcesso != nil && strings.TrimSpace(*req.ChaveAcesso) != "",
 	}).Info("CancelarNfse")
 
 	var response CancelarNfseResponse

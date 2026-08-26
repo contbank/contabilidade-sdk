@@ -251,12 +251,23 @@ type ObservacaoInput struct {
 
 // --- Cancelar NFS-e ---
 
+// MotivoCancelamentoCodigo códigos ABRASF / Contabilidade.com (swagger cancelar).
+const (
+	MotivoCancelamentoErroEmissao = int32(1) // erro na emissão / digitação (default)
+)
+
 // CancelarNfseRequest is the body for POST /api/nfse/cancelar.
+// SP (PMSP) usa Numero + CodigoVerificacao + IM; Portal Nacional exige também
+// MunicipioCodigoIBGE, ChaveAcesso e motivo de cancelamento.
 type CancelarNfseRequest struct {
-	Certificado        *CertificadoDto `json:"Certificado,omitempty"`
-	Numero             int64           `json:"Numero"`
-	CodigoVerificacao  *string         `json:"CodigoVerificacao,omitempty"`
-	InscricaoMunicipal *string         `json:"InscricaoMunicipal,omitempty"`
+	Certificado                 *CertificadoDto `json:"Certificado,omitempty"`
+	Numero                      int64           `json:"Numero"`
+	CodigoVerificacao           *string         `json:"CodigoVerificacao,omitempty"`
+	InscricaoMunicipal          *string         `json:"InscricaoMunicipal,omitempty"`
+	MunicipioCodigoIBGE         *string         `json:"MunicipioCodigoIBGE,omitempty"`
+	ChaveAcesso                 *string         `json:"ChaveAcesso,omitempty"`
+	MotivoCancelamentoCodigo    *int32          `json:"MotivoCancelamentoCodigo,omitempty"`
+	MotivoCancelamentoDescricao *string         `json:"MotivoCancelamentoDescricao,omitempty"`
 }
 
 // CancelarNfseResponse is the result of a cancellation attempt.

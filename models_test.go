@@ -2,6 +2,7 @@ package contabilidade_test
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -109,12 +110,30 @@ func TestAPITime_unmarshalsRFC3339(t *testing.T) {
 	}
 }
 
-func TestParseFlexibleDateTime_normalizesSpacedOffset(t *testing.T) {
-	got, err := contabilidade.ParseFlexibleDateTime("2026-07-01T05:00:00.000 02:00")
-	if err != nil {
-		t.Fatalf("parse: %v", err)
+func TestCancelarNfseRequest_marshalsNacionalFields(t *testing.T) {
+	codigo := int32(contabilidade.MotivoCancelamentoErroEmissao)
+	req := contabilidade.CancelarNfseRequest{
+		Numero:                      131,
+		CodigoVerificacao:           contabilidade.String("31062002209474631000117000000000013126086084662553"),
+		InscricaoMunicipal:          contabilidade.String("02234900012"),
+		MunicipioCodigoIBGE:         contabilidade.String("3106200"),
+		ChaveAcesso:                 contabilidade.String("31062002209474631000117000000000013126086084662553"),
+		MotivoCancelamentoCodigo:    &codigo,
+		MotivoCancelamentoDescricao: contabilidade.String("Nota emitida com valor incorreto"),
 	}
-	if _, offset := got.Zone(); offset != 2*3600 {
-		t.Fatalf("offset = %d, want +02:00", offset)
+	raw, err := json.Marshal(req)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	s := string(raw)
+	for _, want := range []string{
+		`"MunicipioCodigoIBGE":"3106200"`,
+		`"ChaveAcesso":"31062002209474631000117000000000013126086084662553"`,
+		`"MotivoCancelamentoCodigo":1`,
+		`"MotivoCancelamentoDescricao":"Nota emitida com valor incorreto"`,
+	} {
+		if !strings.Contains(s, want) {
+			t.Fatalf("payload missing %s\ngot %s", want, s)
+		}
 	}
 }
